@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0f766e">
+  <title>MedQCM — Entraînez-vous. Corrigez vos erreurs. Progressez.</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Barre du haut -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <button type="button" class="brand" data-action="home" aria-label="MedQCM, retour à l’accueil">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M10 3h4v7h7v4h-7v7h-4v-7H3v-4h7z"/></svg>
+        </span>
+        <span class="brand-name">MedQCM</span>
+      </button>
+      <button type="button" class="home-link" id="home-btn" data-action="home" hidden>Accueil</button>
+    </div>
+  </header>
+
+  <!-- Contenu : rempli par script.js -->
+  <main id="app" class="container">
+    <noscript>
+      <p class="noscript">MedQCM a besoin de JavaScript pour fonctionner. Activez JavaScript dans votre navigateur.</p>
+    </noscript>
+  </main>
+
+  <footer class="footer container">
+    Votre progression est enregistrée automatiquement sur cet appareil.
+  </footer>
+
+  <!-- Ordre important : les questions d'abord, puis la logique -->
+  <script src="questions.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
