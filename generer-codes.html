@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex">
+  <title>MedQCM — Générateur de codes d’accès</title>
+  <link rel="stylesheet" href="../style.css">
+  <style>
+    .tool textarea {
+      display: block; width: 100%; min-height: 150px; margin-top: 8px; padding: 12px;
+      border: 1.5px solid var(--line-strong); border-radius: 12px; background: #fff;
+      font: 0.92rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: var(--text);
+    }
+    .tool label { font-weight: 650; }
+    .tool .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 12px; }
+    .tool input[type=number] { width: 110px; min-height: 48px; padding: 0 12px; border: 1.5px solid var(--line-strong); border-radius: 12px; font-size: 1.1rem; }
+    .tool section { margin-top: 26px; }
+    .tool h2 { font-family: var(--font-serif); font-size: 1.25rem; }
+  </style>
+</head>
+<body>
+  <main class="container tool" style="padding-top:24px;padding-bottom:40px">
+    <div class="card">
+      <h1 style="font-family:var(--font-serif);font-size:1.6rem">Générateur de codes d’accès</h1>
+      <p class="muted" style="margin-top:6px">
+        Outil à utiliser sur votre ordinateur. Rien n’est envoyé sur Internet : tout se passe dans cette page.
+      </p>
+
+      <div class="notice" style="margin-top:16px">
+        <strong>Important :</strong> les <em>codes</em> (bloc 1) sont à donner à vos clients et à garder privés.
+        Seules les <em>empreintes</em> (bloc 2) se collent dans <code>activation.js</code>.
+        Ne publiez jamais la liste des codes sur GitHub.
+      </div>
+
+      <section>
+        <h2>Étape 1 — Créer des codes</h2>
+        <div class="row">
+          <label for="count">Nombre de codes</label>
+          <input id="count" type="number" min="1" max="500" value="10" inputmode="numeric">
+          <button type="button" class="btn btn-primary" id="gen">Générer</button>
+        </div>
+        <p class="muted" style="margin-top:8px">Ou collez vos propres codes (un par ligne) dans le bloc 1.</p>
+      </section>
+
+      <section>
+        <label for="codes">Bloc 1 — Codes à donner aux clients (privé)</label>
+        <textarea id="codes" spellcheck="false" placeholder="MED-XXXX-XXXX"></textarea>
+        <div class="row"><button type="button" class="btn btn-secondary" id="copy-codes">Copier les codes</button></div>
+      </section>
+
+      <section>
+        <h2>Étape 2 — Empreintes</h2>
+        <div class="row"><button type="button" class="btn btn-primary" id="hash">Calculer les empreintes</button></div>
+        <label for="hashes" style="display:block;margin-top:14px">Bloc 2 — À coller dans <code>VALID_CODE_HASHES</code> (activation.js)</label>
+        <textarea id="hashes" readonly spellcheck="false"></textarea>
+        <div class="row"><button type="button" class="btn btn-secondary" id="copy-hashes">Copier les empreintes</button></div>
+        <p class="muted" id="status" style="margin-top:10px" role="status"></p>
+      </section>
+    </div>
+  </main>
+
+  <script src="../activation.js"></script>
+  <script>
+    (function () {
+      var ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // sans O/0 ni I/1 (moins d'erreurs de recopie)
+      var codesEl = document.getElementById('codes');
+      var hashesEl = document.getElementById('hashes');
+      var statusEl = document.getElementById('status');
+
+      function randomBlock(n) {
+        var out = '';
+        var buf = new Uint32Array(n);
+        (window.crypto || window.msCrypto).getRandomValues(buf);
+        for (var i = 0; i < n; i++) out += ALPHABET[buf[i] % ALPHABET.length];
+        return out;
+      }
+
+      document.getElementById('gen').addEventListener('click', function () {
+        var n = Math.max(1, Math.min(500, parseInt(document.getElementById('count').value, 10) || 1));
+        var seen = {}, list = [];
+        while (list.length < n) {
+          var code = 'MED-' + randomBlock(4) + '-' + randomBlock(4);
+          if (!seen[code]) { seen[code] = true; list.push(code); }
+        }
+        codesEl.value = list.join('\n');
+        hashesEl.value = '';
+        statusEl.textContent = n + ' codes générés. Passez à l’étape 2.';
+      });
+
+      document.getElementById('hash').addEventListener('click', function () {
+        var lines = codesEl.value.split('\n'), seen = {}, out = [], bad = 0;
+        lines.forEach(function (line) {
+          if (!line.trim()) return;
+          var norm = MedQCMActivation.normalizeCode(line);
+          if (!/^MED[A-Z0-9]{8}$/.test(norm)) { bad++; return; }
+          var h = MedQCMActivation.hashCode(norm);
+          if (!seen[h]) { seen[h] = true; out.push("      '" + h + "'"); }
+        });
+        hashesEl.value = out.join(',\n');
+        statusEl.textContent = out.length + ' empreinte(s) calculée(s)' +
+          (bad ? ' — ' + bad + ' ligne(s) ignorée(s) (format attendu : MED-XXXX-XXXX).' : '.');
+      });
+
+      function copy(el, label) {
+        el.select();
+        try { document.execCommand('copy'); statusEl.textContent = label + ' copié(es).'; }
+        catch (e) { statusEl.textContent = 'Copie impossible : sélectionnez le texte et copiez-le à la main.'; }
+      }
+      document.getElementById('copy-codes').addEventListener('click', function () { copy(codesEl, 'Codes'); });
+      document.getElementById('copy-hashes').addEventListener('click', function () { copy(hashesEl, 'Empreintes'); });
+    })();
+  </script>
+</body>
+</html>
