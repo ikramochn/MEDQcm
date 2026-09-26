@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <!-- viewport-fit=cover : utilise tout l'écran des iPhone (encoche), géré par les "safe areas" du CSS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="color-scheme" content="light">
+  <title>MedQCM</title>
+
+  <!-- Web app : installation sur l'écran d'accueil -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="MedQCM">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Barre du haut -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <button type="button" class="brand" data-action="home" aria-label="MedQCM, home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" width="20" height="20" fill="none"><path d="M14 6v10a8 8 0 0 0 16 0V6" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path d="M14 6a2 2 0 1 0 0-.01M30 6a2 2 0 1 0 0-.01" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><path d="M22 24v6a8 8 0 0 0 16 0v-3" stroke="currentColor" stroke-width="3.4" stroke-linecap="round"/><circle cx="40" cy="27" r="4" stroke="currentColor" stroke-width="3.4"/><circle cx="22" cy="23" r="3.2" stroke="currentColor" stroke-width="2.8"/></svg>
+        </span>
+        <span class="brand-name">MedQCM</span>
+      </button>
+      <button type="button" class="home-link" id="home-btn" data-action="home" hidden>Accueil</button>
+    </div>
+  </header>
+
+  <!-- Contenu : rempli par script.js (page d'activation, puis application) -->
+  <main id="app" class="container">
+    <noscript>
+      <p class="noscript">MedQCM a besoin de JavaScript pour fonctionner. Activez JavaScript dans votre navigateur.</p>
+    </noscript>
+  </main>
+
+  <footer class="footer container" id="app-footer" hidden>
+    <p id="footer-text"></p>
+  </footer>
+
+  <!-- Ordre important : questions, langue, activation, puis la logique de l'application -->
+  <script src="questions.js"></script>
+  <script src="i18n.js"></script>
+  <script src="activation.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
